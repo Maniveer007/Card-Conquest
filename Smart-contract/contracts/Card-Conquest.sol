@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.19;
-
 import "fhevm/lib/TFHE.sol";
 
 
@@ -424,10 +423,14 @@ contract Card_Conquest  {
         players[p2.index].playerMana = TFHE.add(players[p2.index].playerMana,3) ;
     }
 
-    uint winner=TFHE.decrypt(TFHEwinner);
-    if(winner!=0){
-      _endBattle(_battle.players[winner-1], _battle);
+    uint8 winner=TFHE.decrypt(TFHEwinner);
+    if(winner==1){
+      _endBattle(_battle.players[0], _battle);
     }
+    else if(winner==2){
+      _endBattle(_battle.players[1], _battle);
+    }
+    
 
 
     emit RoundEnded(
@@ -488,6 +491,12 @@ contract Card_Conquest  {
     emit BattleEnded(_battle.name, battleEnder, _battleLoser); // Emits BattleEnded event
 
     return _battle;
+  }
+  function test(bool _bol,uint _a,uint _b)public view returns(uint){
+    ebool bol=TFHE.asEbool(_bol);
+    euint8 a=TFHE.asEuint8(_a);
+    euint8 b=TFHE.asEuint8(_b);
+    return TFHE.decrypt(TFHE.cmux(bol,a-b,a));
   }
 
 }
