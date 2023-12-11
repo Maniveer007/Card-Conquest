@@ -15,10 +15,45 @@ Card Conquest is a Fully onchain Multiplayer game Unlocks abilty to Battle with 
 - Docker
 - ZAMA's Devnet
 
+## Introduction:
+
+This game puts two players against each other in a strategic card battle, where each player chooses to attack or defend each turn. Attacking deals damage to the opponent's health, while defending mitigates incoming attacks. The game leverages ZAMA's unique features to provide a secure and engaging gameplay experience, including:
+
+ - **Smart contracts**: Manage game logic, automate turns, and track player health.
+ - **fhEVM** : Ensure player choices (attack/defend) remain private until revealed.
 
 
 
+## ZAMA Integration:
 
+The game incorporates ZAMA's capabilities in the following ways:
+
+**Smart Contract**:
+
+Handles turn management, including:
+ - Player turn order.
+ - Card draw and play mechanics.
+ - Damage calculation and health updates.
+ - Game ending conditions and victory determination.
+- Tracks player health and card availability.
+
+**fhEVM**:
+
+- Encrypts players' choices (attack/defend) using fhEVM during their turn.
+- Only the smart contract can decrypt and reveal players' actions after both players have chosen.
+- This ensures players' strategies remain hidden until the reveal, adding an element of surprise and tactical depth.
+
+
+## Benefits of Using ZAMA:
+
+- Enhanced security: Smart contracts ensure tamper-proof game logic and fair reward distribution.
+- Strategic gameplay: fhEVM allows hidden choices, adding depth and excitement to the game.
+- Transparency: Game history and player actions are permanently recorded on the blockchain.
+- Scalability: The game can accommodate a large number of players and transactions.
+
+## Conclusion:
+
+This on-chain card battle game showcases the effective use of ZAMA in creating a safe, strategic, and engaging gameplay experience. ZAMA's technology allows for innovative game mechanics and ensures trust and fairness among players. This application paves the way for future exciting and engaging blockchain-based games.
 ## Run Locally
 
 Clone the project
