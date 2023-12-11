@@ -267,8 +267,8 @@ contract Card_Conquest  {
 
   function _registerPlayerMove(uint256 _player, uint8 _choice, string memory _battleName) internal {
     require(_choice == 1 || _choice == 2, "Choice should be either 1 or 2!");
-    // require(_choice == 1 ? getPlayer(msg.sender).playerMana >= 3 : true, "Mana not sufficient for attacking!");
-    // TFHE.optReq(TFHE.and(TFHE.ge(getPlayer(msg.sender).playerMana,3),TFHE.asEbool(_choice == 1)));
+    require(_choice == 1 ? getPlayer(msg.sender).playerMana >= 3 : true, "Mana not sufficient for attacking!");
+    TFHE.optReq(TFHE.and(TFHE.ge(getPlayer(msg.sender).playerMana,3),TFHE.asEbool(_choice == 1)));
     if(_choice == 1){
     TFHE.optReq(TFHE.ge(getPlayer(msg.sender).playerMana,3));
     }
