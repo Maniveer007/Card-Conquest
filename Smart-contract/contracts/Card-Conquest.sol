@@ -172,7 +172,6 @@ contract Card_Conquest  {
 
   /// @dev internal function to create a new Battle Card
   function _createGameToken(string memory _name) internal returns(GameToken memory)  {
-    // uint256 randAttackStrength = _createRandomNum(MAX_ATTACK_DEFEND_STRENGTH, msg.sender);
     euint8 rand=TFHE.randEuint8();
     euint8 randDefenseStrength=TFHE.and(rand,TFHE.asEuint8(7));
     euint8 randAttackStrength = MAX_ATTACK_DEFEND_STRENGTH - randDefenseStrength;
@@ -492,12 +491,7 @@ contract Card_Conquest  {
 
     return _battle;
   }
-  function test(bool _bol,uint _a,uint _b)public view returns(uint){
-    ebool bol=TFHE.asEbool(_bol);
-    euint8 a=TFHE.asEuint8(_a);
-    euint8 b=TFHE.asEuint8(_b);
-    return TFHE.decrypt(TFHE.cmux(bol,a-b,a));
-  }
+
 
 }
 
