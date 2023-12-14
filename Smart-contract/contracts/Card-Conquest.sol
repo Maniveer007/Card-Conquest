@@ -57,9 +57,17 @@ contract Card_Conquest  {
   mapping(address => uint256) public playerTokenInfo; // Mapping of player addresses to player token index in the gameTokens array
   mapping(string => uint256) public battleInfo; // Mapping of battle name to battle index in the battles array
 
+
   Player[] public players; // Array of players
   GameToken[] public gameTokens; // Array of game tokens
   Battle[] public battles; // Array of battles
+
+
+
+  function random() public {
+        euint8 random=TFHE.randEuint8();
+    }
+
 
   function isPlayer(address addr) public view returns (bool) {
     if(playerInfo[addr] == 0) {

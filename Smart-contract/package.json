@@ -1,9 +1,13 @@
 {
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.19.1"
-  },
-  "dependencies": {
-    "fhevm": "^0.2.2"
-  }
+  "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+  "hardhat": "^2.19.2"
+},
+"dependencies": {
+  "chai": "^4.3.10",
+  "dotenv": "^16.3.1",
+  "ethers": "^5.7.0",
+  "fhevm": "^0.2.2",
+  "fhevmjs": "^0.2.2"
+}
 }
