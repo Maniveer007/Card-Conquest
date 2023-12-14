@@ -12,6 +12,7 @@ const Home = () => {
 
   const handleClick = async () => {
     try {
+
       const playerExists = await contract.isPlayer(walletAddress);
 
       if (!playerExists) {
@@ -26,6 +27,7 @@ const Home = () => {
         setTimeout(() => navigate('/create-battle'), 8000);
       }
     } catch (error) {
+      console.log(error);
       setErrorMessage(error);
     }
   };

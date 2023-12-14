@@ -138,84 +138,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "CELESTION",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "DEVIL",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "FIREBIRD",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "GRIFFIN",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "KAMO",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "KUKULKAN",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "MAX_ATTACK_DEFEND_STRENGTH",
 		"outputs": [
 			{
@@ -225,47 +147,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			}
-		],
-		"name": "_createGameToken",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "euint8",
-						"name": "attackStrength",
-						"type": "uint256"
-					},
-					{
-						"internalType": "euint8",
-						"name": "defenseStrength",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct AVAXGods.GameToken",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -316,7 +197,7 @@
 		"name": "battles",
 		"outputs": [
 			{
-				"internalType": "enum AVAXGods.BattleStatus",
+				"internalType": "enum Card_Conquest.BattleStatus",
 				"name": "battleStatus",
 				"type": "uint8"
 			},
@@ -352,7 +233,7 @@
 			{
 				"components": [
 					{
-						"internalType": "enum AVAXGods.BattleStatus",
+						"internalType": "enum Card_Conquest.BattleStatus",
 						"name": "battleStatus",
 						"type": "uint8"
 					},
@@ -382,7 +263,7 @@
 						"type": "address"
 					}
 				],
-				"internalType": "struct AVAXGods.Battle",
+				"internalType": "struct Card_Conquest.Battle",
 				"name": "",
 				"type": "tuple"
 			}
@@ -444,7 +325,7 @@
 			{
 				"components": [
 					{
-						"internalType": "enum AVAXGods.BattleStatus",
+						"internalType": "enum Card_Conquest.BattleStatus",
 						"name": "battleStatus",
 						"type": "uint8"
 					},
@@ -474,7 +355,7 @@
 						"type": "address"
 					}
 				],
-				"internalType": "struct AVAXGods.Battle[]",
+				"internalType": "struct Card_Conquest.Battle[]",
 				"name": "",
 				"type": "tuple[]"
 			}
@@ -509,7 +390,7 @@
 						"type": "uint256"
 					}
 				],
-				"internalType": "struct AVAXGods.GameToken[]",
+				"internalType": "struct Card_Conquest.GameToken[]",
 				"name": "",
 				"type": "tuple[]"
 			}
@@ -549,7 +430,7 @@
 						"type": "bool"
 					}
 				],
-				"internalType": "struct AVAXGods.Player[]",
+				"internalType": "struct Card_Conquest.Player[]",
 				"name": "",
 				"type": "tuple[]"
 			}
@@ -570,7 +451,7 @@
 			{
 				"components": [
 					{
-						"internalType": "enum AVAXGods.BattleStatus",
+						"internalType": "enum Card_Conquest.BattleStatus",
 						"name": "battleStatus",
 						"type": "uint8"
 					},
@@ -600,7 +481,7 @@
 						"type": "address"
 					}
 				],
-				"internalType": "struct AVAXGods.Battle",
+				"internalType": "struct Card_Conquest.Battle",
 				"name": "",
 				"type": "tuple"
 			}
@@ -670,7 +551,7 @@
 						"type": "bool"
 					}
 				],
-				"internalType": "struct AVAXGods.Player",
+				"internalType": "struct Card_Conquest.Player",
 				"name": "",
 				"type": "tuple"
 			}
@@ -721,7 +602,7 @@
 						"type": "bool"
 					}
 				],
-				"internalType": "struct AVAXGods.ReturnPlayer",
+				"internalType": "struct Card_Conquest.ReturnPlayer",
 				"name": "",
 				"type": "tuple"
 			}
@@ -762,7 +643,7 @@
 						"type": "uint256"
 					}
 				],
-				"internalType": "struct AVAXGods.GameToken",
+				"internalType": "struct Card_Conquest.GameToken",
 				"name": "",
 				"type": "tuple"
 			}
@@ -808,7 +689,7 @@
 						"type": "bytes"
 					}
 				],
-				"internalType": "struct AVAXGods.returnGameToken",
+				"internalType": "struct Card_Conquest.returnGameToken",
 				"name": "",
 				"type": "tuple"
 			}
@@ -886,7 +767,7 @@
 			{
 				"components": [
 					{
-						"internalType": "enum AVAXGods.BattleStatus",
+						"internalType": "enum Card_Conquest.BattleStatus",
 						"name": "battleStatus",
 						"type": "uint8"
 					},
@@ -916,7 +797,7 @@
 						"type": "address"
 					}
 				],
-				"internalType": "struct AVAXGods.Battle",
+				"internalType": "struct Card_Conquest.Battle",
 				"name": "",
 				"type": "tuple"
 			}
@@ -1028,13 +909,6 @@
 			}
 		],
 		"name": "registerPlayer",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "testGenerate",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
