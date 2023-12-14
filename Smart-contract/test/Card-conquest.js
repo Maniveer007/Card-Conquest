@@ -8,9 +8,7 @@ const hre = require("hardhat");
 
 
 const fhevmjs =require('fhevmjs')
-// const { ethers } = require('hardhat')
-// const { ethers } = require('hardhat')
-// ethers
+
 
 describe("Card conquest contract",function(){
     let alice,bob
@@ -57,8 +55,7 @@ describe("Card conquest contract",function(){
         const txbob=await bobcontract.registerPlayer("alice","alice",{gasLimit})
         await txbob.wait()
 
-        // await Promise.all([txalice.wait,txbob.wait])
-        // done()
+
     })
 
     it('alice create battle bob will join it ', async function(){
@@ -66,11 +63,8 @@ describe("Card conquest contract",function(){
         const txcreate=await alicecontract.createBattle("aliceVSbob",{gasLimit})
         await txcreate.wait();
 
-        // await new Promise(resolve => setTimeout(resolve, 10000));
-
         const txjoin=await bobcontract.joinBattle("aliceVSbob",{gasLimit});
         await txjoin.wait()
-        // done()
     })
 
     it("setting up instance",async function (){
@@ -83,9 +77,7 @@ describe("Card conquest contract",function(){
 
 
         publicKey = await provider.call({
-            to: '0x0000000000000000000000000000000000000044',
-            // data: '0xd9d47bb001',
-            
+            to: '0x0000000000000000000000000000000000000044',            
           });
           
 
@@ -164,6 +156,18 @@ describe("Card conquest contract",function(){
        console.log(`alice health after :${alicehealth} bobhealth after:${bobhealth}`);
        console.log(`alice Mana after :${aliceMana} bobMana after:${bobMana}`);
     })
+
+    it("reject alice transaction due to lower Mana",async function(){
+        const txalice=await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+        await txalice.wait()
+        
+        const txbob=await bobcontract.attackOrDefendChoice(1,"aliceVSbob")
+        await txbob.wait()
+
+       const txrejected= await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+    //    await rjectedtx.wait()
+        await expect(txrejected.wait()).to.be.rejected
+    })
     it("alice is defending and bob is attacking",async function (){
         let alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
         let bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
@@ -173,8 +177,8 @@ describe("Card conquest contract",function(){
         let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
         let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
 
-        expect(aliceMana).to.equal(4);
-        expect(bobMana).to.equal(10);
+        expect(aliceMana).to.equal(1);
+        expect(bobMana).to.equal(7);
 
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
@@ -193,8 +197,8 @@ describe("Card conquest contract",function(){
         aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
         bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
 
-        expect(aliceMana).to.equal(7);
-        expect(bobMana).to.equal(7);
+        expect(aliceMana).to.equal(4);
+        expect(bobMana).to.equal(4);
 
        console.log(`alice health after :${alicehealth} bobhealth after:${bobhealth}`);
        console.log(`alice Mana after :${aliceMana} bobMana after:${bobMana}`);
@@ -209,8 +213,8 @@ describe("Card conquest contract",function(){
         let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
         let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
 
-        expect(aliceMana).to.equal(7);
-        expect(bobMana).to.equal(7);
+        expect(aliceMana).to.equal(4);
+        expect(bobMana).to.equal(4);
 
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
@@ -229,8 +233,8 @@ describe("Card conquest contract",function(){
          aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
          bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
 
-         expect(aliceMana).to.equal(10);
-         expect(bobMana).to.equal(10);
+         expect(aliceMana).to.equal(7);
+         expect(bobMana).to.equal(7);
 
         console.log(`alice health after :${alicehealth} bobhealth after:${bobhealth}`);
         console.log(`alice Mana after :${aliceMana} bobMana after:${bobMana}`);
