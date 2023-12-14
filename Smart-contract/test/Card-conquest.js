@@ -45,8 +45,6 @@ describe("Card conquest contract",function(){
 
     it("registering alice and bob",async function(){
         
-        const txrandom =await alicecontract.random({gasLimit});
-        await txrandom.wait();
 
         const txalice=await alicecontract.registerPlayer("alice","alice",{gasLimit})
         await txalice.wait()

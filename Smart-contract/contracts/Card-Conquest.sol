@@ -64,10 +64,6 @@ contract Card_Conquest  {
 
 
 
-  function random() public {
-        euint8 random=TFHE.randEuint8();
-    }
-
 
   function isPlayer(address addr) public view returns (bool) {
     if(playerInfo[addr] == 0) {
