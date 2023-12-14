@@ -13,7 +13,6 @@ const fhevmjs =require('fhevmjs')
 describe("Card conquest contract",function(){
     let alice,bob
     let alicecontract,bobcontract;
-    const gasLimit = 1000000;
     let instance,publicKey,token
     it("initalising signer ",async function (){
        const {ACCOUNT_1_PRIVATE_KEY,ACCOUNT_2_PRIVATE_KEY}=process.env
@@ -37,7 +36,6 @@ describe("Card conquest contract",function(){
 
         const CardConquest = await hre.ethers.getContractFactory("Card_Conquest",alice);
 
-
          alicecontract = await CardConquest.deploy();      
 
         bobcontract=alicecontract.connect(bob)
@@ -46,11 +44,11 @@ describe("Card conquest contract",function(){
     it("registering alice and bob",async function(){
         
 
-        const txalice=await alicecontract.registerPlayer("alice","alice",{gasLimit})
+        const txalice=await alicecontract.registerPlayer("alice","alice",{gasLimit:1000000})
         await txalice.wait()
         
 
-        const txbob=await bobcontract.registerPlayer("alice","alice",{gasLimit})
+        const txbob=await bobcontract.registerPlayer("bob","bob")
         await txbob.wait()
 
 
@@ -58,10 +56,10 @@ describe("Card conquest contract",function(){
 
     it('alice create battle bob will join it ', async function(){
         
-        const txcreate=await alicecontract.createBattle("aliceVSbob",{gasLimit})
+        const txcreate=await alicecontract.createBattle("aliceVSbob")
         await txcreate.wait();
 
-        const txjoin=await bobcontract.joinBattle("aliceVSbob",{gasLimit});
+        const txjoin=await bobcontract.joinBattle("aliceVSbob");
         await txjoin.wait()
     })
 
