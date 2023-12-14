@@ -11,44 +11,42 @@ const fhevmjs =require('fhevmjs')
 
 
 describe("Card conquest contract",function(){
-    let alice,bob
-    let alicecontract,bobcontract;
-    let instance,publicKey,token
+
     it("initalising signer ",async function (){
        const {ACCOUNT_1_PRIVATE_KEY,ACCOUNT_2_PRIVATE_KEY}=process.env
 
        const provider=new ethers.providers.JsonRpcProvider('http://localhost:8545/')
 
-        alice= new ethers.Wallet(ACCOUNT_1_PRIVATE_KEY,provider)
-        bob= new ethers.Wallet(ACCOUNT_2_PRIVATE_KEY,provider)
+        this.alice= new ethers.Wallet(ACCOUNT_1_PRIVATE_KEY,provider)
+        this.bob= new ethers.Wallet(ACCOUNT_2_PRIVATE_KEY,provider)
         
-    if(Number(await provider.getBalance(alice.address))<1 *10**9){
+    if(Number(await provider.getBalance(this.alice.address))<1 *10**9){
         console.log('funded alice');
-        await execute(`docker exec -i fhevm faucet ${alice.address}`)
+        await execute(`docker exec -i fhevm faucet ${this.alice.address}`)
     }
-    if(Number(await provider.getBalance(bob.address))<1*10**9){
+    if(Number(await provider.getBalance(this.bob.address))<1*10**9){
         console.log('funded Bob');
-        await execute(`docker exec -i fhevm faucet ${bob.address}`)
+        await execute(`docker exec -i fhevm faucet ${this.bob.address}`)
     }
     })
 
     it("deploying contract",async function(){
 
-        const CardConquest = await hre.ethers.getContractFactory("Card_Conquest",alice);
+        const CardConquest = await hre.ethers.getContractFactory("Card_Conquest",this.alice);
 
-         alicecontract = await CardConquest.deploy();      
+         this.alicecontract = await CardConquest.deploy();      
 
-        bobcontract=alicecontract.connect(bob)
+        this.bobcontract=this.alicecontract.connect(this.bob)
     })
 
     it("registering alice and bob",async function(){
         
 
-        const txalice=await alicecontract.registerPlayer("alice","alice",{gasLimit:1000000})
+        const txalice=await this.alicecontract.registerPlayer("alice","alice",{gasLimit:1000000})
         await txalice.wait()
         
 
-        const txbob=await bobcontract.registerPlayer("bob","bob")
+        const txbob=await this.bobcontract.registerPlayer("bob","bob",{gasLimit:1000000})
         await txbob.wait()
 
 
@@ -56,14 +54,14 @@ describe("Card conquest contract",function(){
 
     it('alice create battle bob will join it ', async function(){
         
-        const txcreate=await alicecontract.createBattle("aliceVSbob")
+        const txcreate=await this.alicecontract.createBattle("aliceVSbob")
         await txcreate.wait();
 
-        const txjoin=await bobcontract.joinBattle("aliceVSbob");
+        const txjoin=await this.bobcontract.joinBattle("aliceVSbob");
         await txjoin.wait()
     })
 
-    it("setting up instance",async function (){
+    it("setting up this.instance",async function (){
 
         const provider=new ethers.providers.JsonRpcProvider('http://localhost:8545/')
 
@@ -72,23 +70,23 @@ describe("Card conquest contract",function(){
         const chainId = Number(network.chainId)
 
 
-        publicKey = await provider.call({
+        const publicKey = await provider.call({
             to: '0x0000000000000000000000000000000000000044',            
           });
           
 
-         instance= await fhevmjs.createInstance({chainId,publicKey})
-         token=instance.generateToken({verifyingContract: alicecontract.address})
+         this.instance= await fhevmjs.createInstance({chainId,publicKey})
+         this.token=this.instance.generateToken({verifyingContract: this.alicecontract.address})
     })
 
     it("alice is attacking and bob is attacking",async function (){
-        let alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        let bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        let alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        let bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        let alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        let bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        let alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        let bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        let aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        let bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(10);
         expect(bobMana).to.equal(10);
@@ -96,19 +94,19 @@ describe("Card conquest contract",function(){
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
         
-        const txalice=await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txalice=await this.alicecontract.attackOrDefendChoice(1,"aliceVSbob")
         await txalice.wait()
         
-        const txbob=await bobcontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txbob=await this.bobcontract.attackOrDefendChoice(1,"aliceVSbob")
         await txbob.wait()
         
-        alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(7);
         expect(bobMana).to.equal(7);
@@ -118,13 +116,13 @@ describe("Card conquest contract",function(){
 
     })
     it("alice is attacking and bob is defending",async function (){
-        let alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        let bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        let alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        let bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        let alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        let bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        let alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        let bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        let aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        let bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(7);
         expect(bobMana).to.equal(7);
@@ -132,19 +130,19 @@ describe("Card conquest contract",function(){
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
 
-        const txalice=await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txalice=await this.alicecontract.attackOrDefendChoice(1,"aliceVSbob")
         await txalice.wait()
         
-        const txbob=await bobcontract.attackOrDefendChoice(2,"aliceVSbob")
+        const txbob=await this.bobcontract.attackOrDefendChoice(2,"aliceVSbob")
         await txbob.wait()
         
-        alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(4);
         expect(bobMana).to.equal(10);
@@ -154,24 +152,24 @@ describe("Card conquest contract",function(){
     })
 
     it("reject alice transaction due to lower Mana",async function(){
-        const txalice=await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txalice=await this.alicecontract.attackOrDefendChoice(1,"aliceVSbob")
         await txalice.wait()
         
-        const txbob=await bobcontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txbob=await this.bobcontract.attackOrDefendChoice(1,"aliceVSbob")
         await txbob.wait()
 
-       const txrejected= await alicecontract.attackOrDefendChoice(1,"aliceVSbob")
+       const txrejected= await this.alicecontract.attackOrDefendChoice(1,"aliceVSbob")
     //    await rjectedtx.wait()
         await expect(txrejected.wait()).to.be.rejected
     })
     it("alice is defending and bob is attacking",async function (){
-        let alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        let bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        let alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        let bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        let alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        let bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        let alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        let bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        let aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        let bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(1);
         expect(bobMana).to.equal(7);
@@ -179,19 +177,19 @@ describe("Card conquest contract",function(){
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
 
-        const txalice=await alicecontract.attackOrDefendChoice(2,"aliceVSbob")
+        const txalice=await this.alicecontract.attackOrDefendChoice(2,"aliceVSbob")
         await txalice.wait()
         
-        const txbob=await bobcontract.attackOrDefendChoice(1,"aliceVSbob")
+        const txbob=await this.bobcontract.attackOrDefendChoice(1,"aliceVSbob")
         await txbob.wait()
         
-        alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(4);
         expect(bobMana).to.equal(4);
@@ -201,13 +199,13 @@ describe("Card conquest contract",function(){
 
     })
     it("alice is defending and bob is defending",async function (){
-        let alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-        let bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+        let alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+        let bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-        let alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-        let bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-        let aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-        let bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+        let alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+        let bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+        let aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+        let bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
         expect(aliceMana).to.equal(4);
         expect(bobMana).to.equal(4);
@@ -215,19 +213,19 @@ describe("Card conquest contract",function(){
         console.log(`alice health before :${alicehealth} bobhealth before:${bobhealth}`);
         console.log(`alice Mana before :${aliceMana} bobMana before:${bobMana}`);
 
-        const txalice=await alicecontract.attackOrDefendChoice(2,"aliceVSbob")
+        const txalice=await this.alicecontract.attackOrDefendChoice(2,"aliceVSbob")
         await txalice.wait()
         
-        const txbob=await bobcontract.attackOrDefendChoice(2,"aliceVSbob")
+        const txbob=await this.bobcontract.attackOrDefendChoice(2,"aliceVSbob")
         await txbob.wait()
         
-         alicedetails=await alicecontract.getPlayerOut(alice.address,token.publicKey)   
-         bobdetails=await bobcontract.getPlayerOut(bob.address,token.publicKey)
+         alicedetails=await this.alicecontract.getPlayerOut(this.alice.address,this.token.publicKey)   
+         bobdetails=await this.bobcontract.getPlayerOut(this.bob.address,this.token.publicKey)
 
-         alicehealth=instance.decrypt(alicecontract.address,alicedetails[3])
-         bobhealth=instance.decrypt(bobcontract.address,bobdetails[3])
-         aliceMana=instance.decrypt(alicecontract.address,alicedetails[2])
-         bobMana=instance.decrypt(bobcontract.address,bobdetails[2])
+         alicehealth=this.instance.decrypt(this.alicecontract.address,alicedetails[3])
+         bobhealth=this.instance.decrypt(this.bobcontract.address,bobdetails[3])
+         aliceMana=this.instance.decrypt(this.alicecontract.address,alicedetails[2])
+         bobMana=this.instance.decrypt(this.bobcontract.address,bobdetails[2])
 
          expect(aliceMana).to.equal(7);
          expect(bobMana).to.equal(7);
