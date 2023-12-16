@@ -1,7 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
 
-const { ACCOUNT_1_PRIVATE_KEY, ACCOUNT_2_PRIVATE_KEY } = process.env;
 
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -21,7 +19,6 @@ module.exports = {
     local:{
       chainId:9000,
       url:'http://localhost:8545',
-      accounts:[`${ACCOUNT_1_PRIVATE_KEY}`,`${ACCOUNT_2_PRIVATE_KEY}`]
     }
   }
 };

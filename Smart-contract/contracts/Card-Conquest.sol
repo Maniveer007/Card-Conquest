@@ -300,7 +300,7 @@ contract Card_Conquest  {
 
     _battle = getBattle(_battleName);
     uint _movesLeft = 2 - (_battle.moves[0] == 0 ? 0 : 1) - (_battle.moves[1] == 0 ? 0 : 1);
-    emit BattleMove(_battleName, _movesLeft == 1 ? true : false);
+    emit BattleMove(_battleName, _movesLeft == 1 ? true : false); 
     
     if(_movesLeft == 0) {
       _awaitBattleResults(_battleName);
@@ -360,40 +360,39 @@ contract Card_Conquest  {
     if (p1.move == 1 && p2.move == 1) {
       
       isplayer1winner=TFHE.ge(p1.attack , p2.health);
-      TFHEwinner=TFHE.cmux(isplayer1winner,TFHE.asEuint8(1),TFHEwinner);
+      TFHEwinner=TFHE.cmux(isplayer1winner,TFHE.asEuint8(1),TFHEwinner); // check is player1 won the Battle
       isplayer2winner=TFHE.ge(p2.attack , p1.health);
-      TFHEwinner=TFHE.cmux(isplayer2winner,TFHE.asEuint8(2),TFHEwinner);
+      TFHEwinner=TFHE.cmux(isplayer2winner,TFHE.asEuint8(2),TFHEwinner); // check is player2 won the Battle
 
-      ebool nowinner=TFHE.eq(TFHEwinner,0);
+      ebool nowinner=TFHE.eq(TFHEwinner,0); // check no player won the Battle
 
+        // Update Health of players
         players[p1.index].playerHealth =TFHE.cmux(nowinner,players[p1.index].playerHealth- p2.attack,players[p1.index].playerHealth);
         players[p2.index].playerHealth =TFHE.cmux(nowinner,players[p2.index].playerHealth-p1.attack,players[p2.index].playerHealth);
        
-
+        // Update Mana of players
         players[p1.index].playerMana =TFHE.cmux(nowinner,TFHE.sub(players[p1.index].playerMana,3),players[p1.index].playerMana);
         players[p2.index].playerMana =TFHE.cmux(nowinner,TFHE.sub(players[p2.index].playerMana,3),players[p2.index].playerMana);
         
 
         // Both player's health damaged
         _damagedPlayers = _battle.players;
-      // }
    
-    } else if (p1.move == 1 && p2.move == 2) {
+    } 
+    else if (p1.move == 1 && p2.move == 2) {
       euint8 PHAD = p2.health + p2.defense;
       isplayer1winner=TFHE.ge(p1.attack , PHAD);
       TFHEwinner=TFHE.cmux(isplayer1winner,TFHE.asEuint8(1),TFHEwinner);
 
-        euint8 healthAfterAttack;
+        euint8 healthAfterAttack; // Assigns Health after attack of Player1
         
           healthAfterAttack = TFHE.cmux(TFHE.gt(p2.defense , p1.attack),p2.health,PHAD - p1.attack);
 
-
           // Player 2 health damaged
           _damagedPlayers[0] = _battle.players[1];
-        
 
         players[p2.index].playerHealth = healthAfterAttack;
-
+        // Update Mana of players
         players[p1.index].playerMana =TFHE.sub(players[p1.index].playerMana,3) ;
         players[p2.index].playerMana = TFHE.add(players[p2.index].playerMana,3) ;
        
@@ -405,7 +404,7 @@ contract Card_Conquest  {
       isplayer2winner=TFHE.ge(p2.attack , PHAD);
       TFHEwinner=TFHE.cmux(isplayer2winner,TFHE.asEuint8(2),TFHEwinner);
 
-        euint8 healthAfterAttack;
+        euint8 healthAfterAttack; // Assigns Health after attack of Player2
         
          healthAfterAttack = TFHE.cmux(TFHE.gt(p1.defense , p2.attack),p1.health,PHAD - p2.attack);
 
@@ -415,11 +414,13 @@ contract Card_Conquest  {
 
         players[p1.index].playerHealth = healthAfterAttack;
 
+        // Update Mana of players
         players[p1.index].playerMana =TFHE.add(players[p1.index].playerMana,3) ;
         players[p2.index].playerMana = TFHE.sub(players[p2.index].playerMana,3) ;
 
       
     } else if (p1.move == 2 && p2.move == 2) {
+      // Update Health of players
         players[p1.index].playerMana =TFHE.add(players[p1.index].playerMana,3) ;
         players[p2.index].playerMana = TFHE.add(players[p2.index].playerMana,3) ;
     }
@@ -446,6 +447,7 @@ contract Card_Conquest  {
     // Reset random attack and defense strength
 
     euint8 rand=TFHE.randEuint8();
+    // we take first 3 bits of random number to calculate random Defence Strength of Player1
     euint8 randDefenceStrength1=TFHE.and(rand,TFHE.asEuint8(7));
 
     gameTokens[playerTokenInfo[_battle.players[0]]].defenseStrength = randDefenceStrength1;
@@ -453,6 +455,7 @@ contract Card_Conquest  {
 
 
     euint8 rand2=TFHE.shr(TFHE.and(rand,TFHE.asEuint8(56)),3);
+    // we take bits from 3to6  of random number to calculate random Defence Strength of Player2
     euint8 randDefenceStrength2=TFHE.and(rand2,TFHE.asEuint8(7));
 
     gameTokens[playerTokenInfo[_battle.players[1]]].defenseStrength = randDefenceStrength2;

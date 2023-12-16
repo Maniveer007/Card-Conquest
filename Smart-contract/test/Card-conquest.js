@@ -10,25 +10,43 @@ const hre = require("hardhat");
 const fhevmjs =require('fhevmjs')
 
 
+
 describe("Card conquest contract",function(){
-
+    
     it("initalising signer ",async function (){
-       const {ACCOUNT_1_PRIVATE_KEY,ACCOUNT_2_PRIVATE_KEY}=process.env
-
-       const provider=new ethers.providers.JsonRpcProvider('http://localhost:8545/')
-
-        this.alice= new ethers.Wallet(ACCOUNT_1_PRIVATE_KEY,provider)
-        this.bob= new ethers.Wallet(ACCOUNT_2_PRIVATE_KEY,provider)
         
-    if(Number(await provider.getBalance(this.alice.address))<1 *10**9){
+        const provider=new ethers.providers.JsonRpcProvider('http://localhost:8545/')
+        
+        this.alice=new ethers.Wallet.createRandom().connect(provider)
+        this.bob=new ethers.Wallet.createRandom().connect(provider)
+
+        const waitForBalance = async (address) => {
+            return new Promise((resolve, reject) => {
+              const checkBalance = async () => {
+                const balance = Number(await provider.getBalance(address));
+                if (balance > 0) {
+                  await provider.off('block', checkBalance);
+                  resolve();
+                }
+              };
+               provider.on('block', checkBalance)
+            });
+          };
+
+
+        
+    if(Number(await provider.getBalance(this.alice.address))==0){
         console.log('funded alice');
         await execute(`docker exec -i fhevm faucet ${this.alice.address}`)
+        await waitForBalance(this.alice.address);
     }
-    if(Number(await provider.getBalance(this.bob.address))<1*10**9){
+    if(Number(await provider.getBalance(this.bob.address))==0){
         console.log('funded Bob');
         await execute(`docker exec -i fhevm faucet ${this.bob.address}`)
+        await waitForBalance(this.bob.address);
     }
     })
+
 
     it("deploying contract",async function(){
 

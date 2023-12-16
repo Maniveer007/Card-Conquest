@@ -5,7 +5,6 @@
 },
 "dependencies": {
   "chai": "^4.3.10",
-  "dotenv": "^16.3.1",
   "ethers": "^5.7.0",
   "fhevm": "^0.2.2",
   "fhevmjs": "^0.2.2"

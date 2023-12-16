@@ -1,23 +1,40 @@
-
+const {  exec  } = require('child_process');
+const { promisify } = require('util');
+const execute = promisify(exec);
+const { ethers } = require('ethers');
 const hre = require("hardhat");
 
 async function main() {
-  const {ACCOUNT_1_PRIVATE_KEY}=process.env
+
 
   const provider=new ethers.providers.JsonRpcProvider('http://localhost:8545/')
 
-  alice= new ethers.Wallet(ACCOUNT_1_PRIVATE_KEY,provider)
+  const waitForBalance = async (address) => {
+    return new Promise((resolve, reject) => {
+      const checkBalance = async () => {
+        const balance = Number(await provider.getBalance(address));
+        if (balance > 0) {
+          await provider.off('block', checkBalance);
+          resolve();
+        }
+      };
+       provider.on('block', checkBalance)
+    });
+  };
 
-  if(Number(await provider.getBalance(alice.address))<1 *10**9){
+   this.alice=new ethers.Wallet.createRandom().connect(provider)
+
+  if(Number(await provider.getBalance(this.alice.address))==0){
     console.log('funded alice');
-    await execute(`docker exec -i fhevm faucet ${alice.address}`)
+    await execute(`docker exec -i fhevm faucet ${this.alice.address}`)
+    await waitForBalance(this.alice.address)
   }
-    const CardConquest = await hre.ethers.getContractFactory("Card_Conquest",alice);
+    const CardConquest = await hre.ethers.getContractFactory("Card_Conquest",this.alice);
 
 
-    alicecontract = await CardConquest.deploy();   
+    this.alicecontract = await CardConquest.deploy();   
 
-    console.log(`contract is deployed at address:${alicecontract.address}`);
+    console.log(`contract is deployed at address:${this.alicecontract.address}`);
 }
 
 
