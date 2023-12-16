@@ -7,8 +7,7 @@ import "fhevm/lib/TFHE.sol";
 
 contract Card_Conquest  {
 
-
-  euint8 public  MAX_ATTACK_DEFEND_STRENGTH = TFHE.asEuint8(10);
+  euint8  MAX_ATTACK_DEFEND_STRENGTH = TFHE.asEuint8(10);
 
   enum BattleStatus{ PENDING, STARTED, ENDED }
 
@@ -100,6 +99,7 @@ contract Card_Conquest  {
     return gameTokens[playerTokenInfo[addr]];
   }
   function getPlayerTokenOut(address addr , bytes32 pk) public view returns (returnGameToken memory) {
+    require(addr==msg.sender,"only player can get their details");
     require(isPlayerToken(addr), "Game token doesn't exist!");
     return returnGameToken(
     gameTokens[playerTokenInfo[addr]].name,gameTokens[playerTokenInfo[addr]].id,TFHE.reencrypt(gameTokens[playerTokenInfo[addr]].attackStrength,pk),TFHE.reencrypt(gameTokens[playerTokenInfo[addr]].defenseStrength,pk)

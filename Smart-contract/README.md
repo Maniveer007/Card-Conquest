@@ -1,3 +1,34 @@
+
+## Run Hardhat Project
+
+Run Docker Image Locally for local development
+
+```
+docker run -i -p 8545:8545 --rm --name fhevm ghcr.io/zama-ai/evmos-dev-node:v0.1.10
+```
+
+Install dependencies
+
+```
+npm install
+```
+
+compile Contract
+```
+npx hardhat compile
+```
+
+deploy Contract
+
+```
+npx hardhat run scripts/deploy.js
+```
+
+run Tests 
+```
+npx hardhat test
+```
+
 **This smart contract facilitates a two-player card battle game with strategic elements and privacy features**.
 
 ## Key Features:
