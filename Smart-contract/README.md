@@ -75,6 +75,159 @@ Integration with other on-chain applications and marketplaces.
 Development of new game modes and features.
 Increased scalability to accommodate a larger number of players.
 Overall, the Card_Conquest smart contract provides a secure and engaging platform for on-chain card battle games.
+## Game Flow:
+
+**1.registerPlayer**:
+
+Assign Player With PlayerCard With Initally 25 Health and 10 Mana
+
+```
+    players.push(Player(msg.sender, _name, TFHE.asEuint8(10), TFHE.asEuint8(25), false)); // Adds player to players array
+    playerInfo[msg.sender] = _id; // Creates player info mapping
+```
+
+**2.createBattle**
+
+initialize Match With 1 Player in Match and waiting for other player to join
+
+```
+    Battle memory _battle = Battle(
+      BattleStatus.PENDING, // Battle pending
+      battleHash, // Battle hash
+      _name, // Battle name
+      [msg.sender, address(0)], // player addresses; player 2 empty until they joins battle
+      [0, 0], // moves for each player
+      address(0) // winner address; empty until battle ends
+    );
+
+    uint256 _id = battles.length;
+    battleInfo[_name] = _id;
+    battles.push(_battle);
+```
+
+**3.joinBattle**
+
+Player will join the Battle
+and Player State will be set to true
+
+```
+    players[playerInfo[_battle.players[0]]].inBattle = true;
+    players[playerInfo[_battle.players[1]]].inBattle = true;
+```
+
+**4.attackOrDefendChoice**
+
+If a players choice is registered and if both player makes move then the Battle result is calculated
+
+```
+    _registerPlayerMove(_battle.players[0] == msg.sender ? 0 : 1, _choice, _battleName);
+
+    _battle = getBattle(_battleName);
+    uint _movesLeft = 2 - (_battle.moves[0] == 0 ? 0 : 1) - (_battle.moves[1] == 0 ? 0 : 1);
+    emit BattleMove(_battleName, _movesLeft == 1 ? true : false); 
+    
+    if(_movesLeft == 0) {
+      _awaitBattleResults(_battleName);
+    }
+```
+
+**5._awaitBattleResults**
+
+If both player chooses attack we will check If any player wins and changes Currentplayer Health and Mana
+
+```
+      isplayer1winner=TFHE.ge(p1.attack , p2.health);
+      TFHEwinner=TFHE.cmux(isplayer1winner,TFHE.asEuint8(1),TFHEwinner); // check is player1 won the Battle
+      isplayer2winner=TFHE.ge(p2.attack , p1.health);
+      TFHEwinner=TFHE.cmux(isplayer2winner,TFHE.asEuint8(2),TFHEwinner); // check is player2 won the Battle
+
+      ebool nowinner=TFHE.eq(TFHEwinner,0); // check no player won the Battle
+
+        // Update Health of players
+        players[p1.index].playerHealth =TFHE.cmux(nowinner,players[p1.index].playerHealth- p2.attack,players[p1.index].playerHealth);
+        players[p2.index].playerHealth =TFHE.cmux(nowinner,players[p2.index].playerHealth-p1.attack,players[p2.index].playerHealth);
+       
+        // Update Mana of players
+        players[p1.index].playerMana =TFHE.cmux(nowinner,TFHE.sub(players[p1.index].playerMana,3),players[p1.index].playerMana);
+        players[p2.index].playerMana =TFHE.cmux(nowinner,TFHE.sub(players[p2.index].playerMana,3),players[p2.index].playerMana);
+        
+
+        // Both player's health damaged
+        _damagedPlayers = _battle.players;
+```
+
+if player 1 choose attack and player2 choose Defence we will check whether player1 wins and Assign player2 health will be decreased
+if player1's attack id greater than player2's defence then player2 health decreaced by the deference else remains unchanged
+
+```
+      euint8 PHAD = p2.health + p2.defense;
+      isplayer1winner=TFHE.ge(p1.attack , PHAD);
+      TFHEwinner=TFHE.cmux(isplayer1winner,TFHE.asEuint8(1),TFHEwinner);
+
+        euint8 healthAfterAttack; // Assigns Health after attack of Player1
+        
+          healthAfterAttack = TFHE.cmux(TFHE.gt(p2.defense , p1.attack),p2.health,PHAD - p1.attack);
+
+          // Player 2 health damaged
+          _damagedPlayers[0] = _battle.players[1];
+
+        players[p2.index].playerHealth = healthAfterAttack;
+        // Update Mana of players
+        players[p1.index].playerMana =TFHE.sub(players[p1.index].playerMana,3) ;
+        players[p2.index].playerMana = TFHE.add(players[p2.index].playerMana,3) ;
+       
+```
+if player2 choose attack and player1 choose Defence we will check whether player2 wins and Assign player1 health will be decreased
+if player2's attack id greater than player1's defence then player1 health decreaced by the deference else remains unchanged
+```
+      euint8 PHAD = p1.health + p1.defense;
+      isplayer2winner=TFHE.ge(p2.attack , PHAD);
+      TFHEwinner=TFHE.cmux(isplayer2winner,TFHE.asEuint8(2),TFHEwinner);
+
+        euint8 healthAfterAttack; // Assigns Health after attack of Player2
+        
+         healthAfterAttack = TFHE.cmux(TFHE.gt(p1.defense , p2.attack),p1.health,PHAD - p2.attack);
+
+          // Player 1 health damaged
+          _damagedPlayers[0] = _battle.players[0];
+        
+
+        players[p1.index].playerHealth = healthAfterAttack;
+
+        // Update Mana of players
+        players[p1.index].playerMana =TFHE.add(players[p1.index].playerMana,3) ;
+        players[p2.index].playerMana = TFHE.sub(players[p2.index].playerMana,3) ;
+```
+
+if Both Player choose Defence their Mana will be increased By 3
+
+```
+        players[p1.index].playerMana =TFHE.add(players[p1.index].playerMana,3) ;
+        players[p2.index].playerMana = TFHE.add(players[p2.index].playerMana,3) ;
+```
+
+after every round we reset players Card 
+```
+    // Reset random attack and defense strength
+
+    euint8 rand=TFHE.randEuint8();
+    // we take first 3 bits of random number to calculate random Defence Strength of Player1
+    euint8 randDefenceStrength1=TFHE.and(rand,TFHE.asEuint8(7));
+
+    gameTokens[playerTokenInfo[_battle.players[0]]].defenseStrength = randDefenceStrength1;
+    gameTokens[playerTokenInfo[_battle.players[0]]].attackStrength = MAX_ATTACK_DEFEND_STRENGTH - randDefenceStrength1;
+
+
+    euint8 rand2=TFHE.shr(TFHE.and(rand,TFHE.asEuint8(56)),3);
+    // we take bits from 3to6  of random number to calculate random Defence Strength of Player2
+    euint8 randDefenceStrength2=TFHE.and(rand2,TFHE.asEuint8(7));
+
+    gameTokens[playerTokenInfo[_battle.players[1]]].defenseStrength = randDefenceStrength2;
+    gameTokens[playerTokenInfo[_battle.players[1]]].attackStrength = MAX_ATTACK_DEFEND_STRENGTH - randDefenceStrength2;  
+```
+
+
+
 
 ## Function Documentation:
 
